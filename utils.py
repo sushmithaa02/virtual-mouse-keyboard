@@ -3,17 +3,24 @@ import math
 
 # --- Keyboard Configuration ---
 KEYBOARD_LAYOUT = [
+    "1234567890",
     "QWERTYUIOP",
     "ASDFGHJKL",
-    "ZXCVBNM"
+    "ZXCVBNM ←",
+    "        "  # 8 space characters = visual space bar row
 ]
+
 
 def create_keyboard_layout():
     """Creates bounding boxes for each key on the virtual keyboard."""
     key_boxes = []
-    key_width, key_height = 60, 60
-    key_margin = 10
-    start_x, start_y = 50, 50
+    # key_width, key_height = 60, 60
+    # key_margin = 10
+    # start_x, start_y = 50, 50
+    key_width, key_height = 50, 50  
+    key_margin = 8                  
+    start_x, start_y = 20, 20       
+
     
     for i, row in enumerate(KEYBOARD_LAYOUT):
         for j, key_char in enumerate(row):

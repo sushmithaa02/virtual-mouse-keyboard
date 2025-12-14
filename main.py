@@ -13,14 +13,18 @@ class VirtualController:
         # --- System and Screen ---
         pyautogui.FAILSAFE = False
         self.screen_width, self.screen_height = pyautogui.size()
-
+       
         # --- Camera ---
         self.cap = cv2.VideoCapture(0)
         if not self.cap.isOpened():
             raise IOError("Cannot open webcam")
+        # Set large enough resolution for keyboard
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 900)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 500)
         self.cam_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.cam_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        
+
+               
         # --- Hand Tracking ---
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
@@ -42,6 +46,12 @@ class VirtualController:
         self.dwell_time = dwell_time
         self.hover_start_time = None
         self.hovered_key = None
+        self.scrolling = False
+        self.last_scroll_y = None
+        self.scroll_threshold = 0.03  # Adjust for sensitivity
+        self.scroll_scaling = 200     # Adjust for scroll speed
+
+
 
     def _process_gestures(self):
         """Identifies and acts on hand gestures based on the current mode."""
@@ -66,9 +76,27 @@ class VirtualController:
         elif self.current_mode == 'KEYBOARD':
             self._handle_keyboard_control(landmarks)
 
+    # def _handle_mouse_control(self, landmarks):
+    #     """Manages mouse actions like movement and clicking."""
+    #     index_tip = landmarks[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
+    #     thumb_tip = landmarks[self.mp_hands.HandLandmark.THUMB_TIP]
+
+    #     # Cursor Movement
+    #     x = np.interp(index_tip.x, (0.1, 0.9), (0, self.screen_width))
+    #     y = np.interp(index_tip.y, (0.1, 0.9), (0, self.screen_height))
+    #     clocx = self.plocx + (x - self.plocx) / self.smoothing
+    #     clocy = self.plocy + (y - self.plocy) / self.smoothing
+    #     pyautogui.moveTo(clocx, clocy)
+    #     self.plocx, self.plocy = clocx, clocy
+
+    #     # Left Click (Index and Thumb pinch)
+    #     if utils.calculate_distance(index_tip, thumb_tip) < self.click_threshold:
+    #         pyautogui.click()
+    #         time.sleep(0.3) # Debounce click
     def _handle_mouse_control(self, landmarks):
-        """Manages mouse actions like movement and clicking."""
         index_tip = landmarks[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
+        middle_tip = landmarks[self.mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
+        ring_tip = landmarks[self.mp_hands.HandLandmark.RING_FINGER_TIP]
         thumb_tip = landmarks[self.mp_hands.HandLandmark.THUMB_TIP]
 
         # Cursor Movement
@@ -79,10 +107,33 @@ class VirtualController:
         pyautogui.moveTo(clocx, clocy)
         self.plocx, self.plocy = clocx, clocy
 
-        # Left Click (Index and Thumb pinch)
+        # Scrolling Gesture: Keep index-thumb pinched and move hand up/down
+        pinch_distance = utils.calculate_distance(index_tip, thumb_tip)
+        pinch_detected = pinch_distance < self.click_threshold
+
+        if pinch_detected:
+            # Use index_tip.y (normalized, 0=top, 1=bottom)
+            if self.last_scroll_y is not None:
+                vertical_movement = self.last_scroll_y - index_tip.y
+                if abs(vertical_movement) > self.scroll_threshold:
+                    pyautogui.scroll(int(vertical_movement * self.scroll_scaling))
+                self.last_scroll_y = index_tip.y
+        else:
+            self.last_scroll_y = None
+
+        # Left click: index-thumb pinch
         if utils.calculate_distance(index_tip, thumb_tip) < self.click_threshold:
             pyautogui.click()
-            time.sleep(0.3) # Debounce click
+            time.sleep(0.3)
+        # Right click: middle-thumb pinch
+        if utils.calculate_distance(middle_tip, thumb_tip) < self.click_threshold:
+            pyautogui.click(button='right')
+            time.sleep(0.3)
+        # Double click: ring-thumb pinch
+        if utils.calculate_distance(ring_tip, thumb_tip) < self.click_threshold:
+            pyautogui.doubleClick()
+            time.sleep(0.3)
+        
 
     def _handle_keyboard_control(self, landmarks):
         """Manages virtual keyboard interactions with dwell-to-type."""
@@ -101,7 +152,19 @@ class VirtualController:
             if self.hovered_key and self.hovered_key['char'] == currently_hovering_key['char']:
                 # Check for dwell time
                 if time.time() - self.hover_start_time > self.dwell_time:
-                    pyautogui.press(currently_hovering_key['char'])
+                    # pyautogui.press(currently_hovering_key['char'])
+                    key_char = currently_hovering_key['char']
+
+                    key_char = currently_hovering_key['char']
+
+                    if key_char == ' ':
+                        pyautogui.press('space')        # spacebar
+                    elif key_char == '←':
+                        pyautogui.press('backspace')    # backspace
+                    else:
+                        pyautogui.press(key_char.lower())
+
+
                     print(f"Typed: {currently_hovering_key['char']}")
                     self.hover_start_time = time.time() # Reset timer
             else:
@@ -131,7 +194,9 @@ class VirtualController:
             hovered_char = self.hovered_key['char'] if self.hovered_key else None
             utils.draw_elements(frame, self.current_mode, self.key_boxes, self.cam_height, hovered_char)
             
+            
             cv2.imshow("Virtual Controller", frame)
+            cv2.setWindowProperty("Virtual Controller", cv2.WND_PROP_TOPMOST, 1)
 
             if cv2.waitKey(5) & 0xFF == ord('q'):
                 break
