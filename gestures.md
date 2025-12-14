@@ -21,6 +21,16 @@ This document outlines the hand gestures used to operate the virtual mouse and k
 * **Action**: Briefly touch the tips of your **index finger** and **thumb** together (a "pinch").
 * **Result**: Performs a single left-click.
 
+### Right Click
+
+* **Action**: Briefly touch the tips of your **middle finger** and **thumb** together (a pinch).
+* **Result**: Performs a single right-click.
+
+### Double Click
+
+* **Action**: Briefly touch the tips of your **ring finger** and **thumb** together (a pinch).
+* **Result**: Performs a double left-click. 
+
 ---
 
 ## Keyboard Mode ⌨️
