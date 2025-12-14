@@ -44,34 +44,4 @@ Press 'q' to quit the application at any time.
 
 👉 Refer to `gestures.md` for a full guide on how to control the application.
 
----
 
-## 📸 Demo
-> *Coming Soon: A GIF or short demo video showing the mouse and keyboard in action!*
-
----
-
-## 📃 License
-This project is licensed under the [MIT License](https://opensource.org/license/mit)
-
----
-
-## 🙌 Contributing
-> *Pull requests are welcome! For major changes, open an issue first to discuss what you’d like to change.*
-
----
-
-## ⭐ Show Your Support
-> *If you like this project, leave a ⭐ on the repo and share it with your peers!*
-
----
-
-## 🔗 Connect
-👨‍💻 Developed by: Saptarshi Mukherjee
-  
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/saptarshi-mukherjee-096191263)
-[![Twitter](https://img.shields.io/badge/Twitter-Follow-1DA1F2?logo=twitter)](https://x.com/MukherjeeXii)
-[![Gmail](https://img.shields.io/badge/Gmail-Email-D14836?logo=gmail&logoColor=white)](mailto:mukherjeesaptarshi289@gmail.com)
-[![Instagram](https://img.shields.io/badge/Instagram-Follow-E4405F?logo=instagram)](https://www.instagram.com/saptarshi.mukherjee.31392?igsh=a3JjbW5kbGhmdHcw)
-[![Facebook](https://img.shields.io/badge/Facebook-Visit-1877F2?logo=facebook)](https://www.facebook.com/saptarshi.mukherjee.31392?mibextid=ZbWKwL)
-[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?logo=github)](https://github.com/Sappymukherjee214)
